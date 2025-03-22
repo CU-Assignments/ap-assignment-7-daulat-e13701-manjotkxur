@@ -3,31 +3,20 @@
 
 using namespace std;
 
-int numDecodings(string s) {
-    if (s.empty() || s[0] == '0') return 0; // Invalid case
-    
-    int n = s.size();
-    vector<int> dp(n + 1, 0);
-    
-    dp[0] = 1; // Empty string has one decoding
-    dp[1] = 1; // Single non-zero digit has one decoding
+int maxProfit(vector<int>& prices) {
+    int profit = 0;
 
-    for (int i = 2; i <= n; i++) {
-        if (s[i - 1] != '0') {
-            dp[i] += dp[i - 1]; // Single-digit decode
-        }
-
-        int twoDigit = stoi(s.substr(i - 2, 2)); // Last two digits
-        if (twoDigit >= 10 && twoDigit <= 26) {
-            dp[i] += dp[i - 2]; // Two-digit decode
+    for (int i = 1; i < prices.size(); i++) {
+        if (prices[i] > prices[i - 1]) {
+            profit += prices[i] - prices[i - 1]; // Buy at i-1, sell at i
         }
     }
-    
-    return dp[n];
+
+    return profit;
 }
 
 int main() {
-    string s = "226";
-    cout << "Number of ways to decode: " << numDecodings(s) << endl;
+    vector<int> prices = {7, 1, 5, 3, 6, 4};
+    cout << "Maximum Profit: " << maxProfit(prices) << endl;
     return 0;
 }

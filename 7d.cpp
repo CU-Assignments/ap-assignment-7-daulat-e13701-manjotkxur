@@ -1,24 +1,31 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
-int climbStairs(int n) {
-    if (n == 1) return 1;
-    if (n == 2) return 2;
+bool canPlaceFlowers(vector<int>& flowerbed, int n) {
+    int size = flowerbed.size();
 
-    int prev1 = 1, prev2 = 2, current;
-    
-    for (int i = 3; i <= n; i++) {
-        current = prev1 + prev2;
-        prev1 = prev2;
-        prev2 = current;
+    for (int i = 0; i < size; i++) {
+        if (flowerbed[i] == 0) {
+            bool leftEmpty = (i == 0 || flowerbed[i - 1] == 0);
+            bool rightEmpty = (i == size - 1 || flowerbed[i + 1] == 0);
+
+            if (leftEmpty && rightEmpty) {
+                flowerbed[i] = 1; // Plant a flower
+                n--;
+
+                if (n == 0) return true; // No more flowers to plant
+            }
+        }
     }
-
-    return current;
+    
+    return n <= 0;
 }
 
 int main() {
-    int n = 5;
-    cout << "Ways to climb " << n << " stairs: " << climbStairs(n) << endl;
+    vector<int> flowerbed = {1, 0, 0, 0, 1};
+    int n = 1;
+    cout << "Can plant " << n << " flowers? " << (canPlaceFlowers(flowerbed, n) ? "True" : "False") << endl;
     return 0;
 }

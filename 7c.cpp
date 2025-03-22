@@ -1,49 +1,50 @@
 #include <iostream>
+#include <vector>
 #include <unordered_map>
+#include <unordered_set>
+#include <stack>
 
 using namespace std;
 
-unordered_map<string, bool> memo; // Memoization map
-
-bool isScrambleUtil(string s1, string s2) {
-    if (s1 == s2) return true; // Base case: strings are equal
-    if (s1.length() != s2.length()) return false; // Length mismatch
+string removeDuplicateLetters(string s) {
+    vector<int> lastIndex(26, 0);  // Store last occurrence index of each character
+    vector<bool> visited(26, false); // To check if a character is already in stack
+    stack<char> stk;  // Monotonic stack for result
     
-    string key = s1 + "_" + s2;
-    if (memo.find(key) != memo.end()) return memo[key];
-
-    int n = s1.length();
-    
-    // Pruning: Check if both strings have the same frequency of characters
-    string temp1 = s1, temp2 = s2;
-    sort(temp1.begin(), temp1.end());
-    sort(temp2.begin(), temp2.end());
-    if (temp1 != temp2) return memo[key] = false;
-
-    // Try every split position
-    for (int i = 1; i < n; i++) {
-        // Case 1: Without swapping
-        if (isScrambleUtil(s1.substr(0, i), s2.substr(0, i)) &&
-            isScrambleUtil(s1.substr(i), s2.substr(i))) {
-            return memo[key] = true;
-        }
-        // Case 2: With swapping
-        if (isScrambleUtil(s1.substr(0, i), s2.substr(n - i)) &&
-            isScrambleUtil(s1.substr(i), s2.substr(0, n - i))) {
-            return memo[key] = true;
-        }
+    // Store the last occurrence index of each character
+    for (int i = 0; i < s.size(); i++) {
+        lastIndex[s[i] - 'a'] = i;
     }
 
-    return memo[key] = false;
-}
+    for (int i = 0; i < s.size(); i++) {
+        char ch = s[i];
 
-bool isScramble(string s1, string s2) {
-    memo.clear();
-    return isScrambleUtil(s1, s2);
+        // If the character is already in the result, skip it
+        if (visited[ch - 'a']) continue;
+
+        // Maintain lexicographical order by popping larger characters if they appear later
+        while (!stk.empty() && stk.top() > ch && lastIndex[stk.top() - 'a'] > i) {
+            visited[stk.top() - 'a'] = false;
+            stk.pop();
+        }
+
+        // Push current character to stack
+        stk.push(ch);
+        visited[ch - 'a'] = true;
+    }
+
+    // Build the result string from the stack
+    string result;
+    while (!stk.empty()) {
+        result = stk.top() + result;
+        stk.pop();
+    }
+
+    return result;
 }
 
 int main() {
-    string s1 = "great", s2 = "rgeat";
-    cout << (isScramble(s1, s2) ? "True" : "False") << endl;
+    string s = "bcabc";
+    cout << "Smallest lexicographical string: " << removeDuplicateLetters(s) << endl;
     return 0;
 }

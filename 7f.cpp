@@ -1,35 +1,45 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
-string expandAroundCenter(string s, int left, int right) {
-    while (left >= 0 && right < s.length() && s[left] == s[right]) {
-        left--;
-        right++;
-    }
-    return s.substr(left + 1, right - left - 1);
-}
+vector<int> threeEqualParts(vector<int>& arr) {
+    int totalOnes = 0;
+    for (int num : arr) totalOnes += num;
 
-string longestPalindrome(string s) {
-    if (s.empty()) return "";
-    
-    string longest = "";
-    
-    for (int i = 0; i < s.length(); i++) {
-        // Odd-length palindrome
-        string odd = expandAroundCenter(s, i, i);
-        // Even-length palindrome
-        string even = expandAroundCenter(s, i, i + 1);
-        
-        if (odd.length() > longest.length()) longest = odd;
-        if (even.length() > longest.length()) longest = even;
+    if (totalOnes % 3 != 0) return {-1, -1};  // Can't split evenly
+
+    if (totalOnes == 0) return {0, (int)arr.size() - 1};  // All zeros case
+
+    int onesPerPart = totalOnes / 3;
+    int first = -1, second = -1, third = -1, onesCount = 0;
+
+    // Locate the start index of each partition
+    for (int i = 0; i < arr.size(); i++) {
+        if (arr[i] == 1) {
+            onesCount++;
+            if (onesCount == 1) first = i;
+            else if (onesCount == onesPerPart + 1) second = i;
+            else if (onesCount == 2 * onesPerPart + 1) third = i;
+        }
     }
-    
-    return longest;
+
+    // Ensure the three parts are identical
+    while (third < arr.size()) {
+        if (arr[first] == arr[second] && arr[second] == arr[third]) {
+            first++, second++, third++;
+        } else {
+            return {-1, -1};
+        }
+    }
+
+    return {first - 1, second};  // Return partition points
 }
 
 int main() {
-    string s = "babad";
-    cout << "Longest Palindromic Substring: " << longestPalindrome(s) << endl;
+    vector<int> arr = {1, 0, 1, 0, 1, 0};
+    vector<int> result = threeEqualParts(arr);
+
+    cout << "[" << result[0] << ", " << result[1] << "]" << endl;
     return 0;
 }

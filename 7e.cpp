@@ -1,23 +1,30 @@
 #include <iostream>
 #include <vector>
-#include <climits>
+#include <algorithm>
 
 using namespace std;
 
-int maxSubArray(vector<int>& nums) {
-    int maxSum = INT_MIN, currentSum = 0;
+int findContentChildren(vector<int>& g, vector<int>& s) {
+    sort(g.begin(), g.end()); // Sort greed factors
+    sort(s.begin(), s.end()); // Sort cookie sizes
 
-    for (int num : nums) {
-        currentSum += num;
-        maxSum = max(maxSum, currentSum);
-        if (currentSum < 0) currentSum = 0; // Reset if sum goes negative
+    int i = 0, j = 0, count = 0;
+
+    while (i < g.size() && j < s.size()) {
+        if (s[j] >= g[i]) { // Cookie can satisfy the child
+            count++;
+            i++; // Move to next child
+        }
+        j++; // Move to next cookie
     }
 
-    return maxSum;
+    return count;
 }
 
 int main() {
-    vector<int> nums = {-2, 1, -3, 4, -1, 2, 1, -5, 4};
-    cout << "Max Subarray Sum: " << maxSubArray(nums) << endl;
+    vector<int> g = {1, 2, 3};  // Children's greed factors
+    vector<int> s = {1, 1};     // Cookie sizes
+
+    cout << "Maximum number of content children: " << findContentChildren(g, s) << endl;
     return 0;
 }

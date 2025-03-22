@@ -1,23 +1,37 @@
 #include <iostream>
 #include <vector>
-#include <climits>
 
 using namespace std;
 
-int maxProfit(vector<int>& prices) {
-    int minPrice = INT_MAX;  // Minimum price to buy
-    int maxProfit = 0;       // Maximum profit
-    
-    for (int price : prices) {
-        minPrice = min(minPrice, price);  // Update minimum price
-        maxProfit = max(maxProfit, price - minPrice);  // Update max profit
+int candy(vector<int>& ratings) {
+    int n = ratings.size();
+    vector<int> candies(n, 1);  // Each child gets at least 1 candy
+
+    // Left-to-right: Ensure right child gets more candy if they have a higher rating
+    for (int i = 1; i < n; i++) {
+        if (ratings[i] > ratings[i - 1]) {
+            candies[i] = candies[i - 1] + 1;
+        }
     }
-    
-    return maxProfit;
+
+    // Right-to-left: Ensure left child gets more candy if they have a higher rating
+    for (int i = n - 2; i >= 0; i--) {
+        if (ratings[i] > ratings[i + 1]) {
+            candies[i] = max(candies[i], candies[i + 1] + 1);
+        }
+    }
+
+    // Sum up the total candies needed
+    int totalCandies = 0;
+    for (int c : candies) {
+        totalCandies += c;
+    }
+
+    return totalCandies;
 }
 
 int main() {
-    vector<int> prices = {7, 1, 5, 3, 6, 4};
-    cout << "Max Profit: " << maxProfit(prices) << endl;
+    vector<int> ratings = {1, 0, 2};
+    cout << "Minimum candies required: " << candy(ratings) << endl;
     return 0;
 }
